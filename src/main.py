@@ -1,7 +1,7 @@
-from db_utils import get_connection, close_connection
-from models import Order
-from import_csv_file import import_file
-import os
+from src.database.db_utils import get_connection, close_connection
+from src.models.models import Order
+from src.importers.import_csv_file import import_file
+
 con = get_connection()
 
 
@@ -80,7 +80,7 @@ while True:
             print(i)
 
     if a == 7:
-        import_file(con, 'orders_file_csv')
+        import_file(con, '../data/orders_file.csv')
         print("Успешно!")
 
 
