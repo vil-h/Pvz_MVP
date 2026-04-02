@@ -1,10 +1,10 @@
 from db_utils import get_connection, close_connection
 from models import Order
 from import_csv_file import import_file
-
+import os
 con = get_connection()
 
-C:\Users\THUNDEROBOT\PycharmProjects\pythonProjectAIR2
+
 print("Для работы укажите свой Логин(ID):")
 EMP_ID = int(input())
 name = con.cursor().execute("""SELECT last_name, first_name
@@ -78,6 +78,13 @@ while True:
         print(f"В система {len(data_log)} операций:")
         for i in data_log:
             print(i)
+
+    if a == 7:
+        import_file(con, 'orders_file_csv')
+        print("Успешно!")
+
+
+
 
     if a == 9:
         print("Хорошего дня")
