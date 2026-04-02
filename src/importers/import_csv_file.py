@@ -1,6 +1,5 @@
 import csv
-import os
-print("Текущая директория:", os.getcwd())
+
 def import_file(db, filename):
     with open(filename, 'r', encoding='utf-8') as file:
         reader = csv.DictReader(file)

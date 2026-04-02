@@ -1,6 +1,6 @@
 import sqlite3
 def get_connection():
-    con = sqlite3.connect("database.db")
+    con = sqlite3.connect("../data/database.db")
     db_init(con)
     return con
 
