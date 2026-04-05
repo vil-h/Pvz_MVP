@@ -1,7 +1,7 @@
 from src.database.db_utils import get_connection, close_connection
 from src.models.models import Order
 from src.importers.import_csv_file import import_file
-
+from src.reports import get_kpi
 con = get_connection()
 
 
@@ -34,7 +34,7 @@ while True:
                                             FROM orders""").fetchall()
         print(f"В система {len(data_orders)} заказов:")
         for i in data_orders:
-            print(f"Заказ № {i[0]}, Клиент: {i[1]}, Статус: {i[2]}, Дата: {i[3]}")
+            print(f"Заказ № {i[0]}, Клиент: {i[1]}, Статус: {i[2]}, Дата прибытия на склад: {i[3]}, Дата получения:{i[4]}")
 
 
     if a == 2:
@@ -74,7 +74,7 @@ while True:
 
     if a == 6:
         data_log = con.cursor().execute("""SELECT *
-                                                    FROM operation_log""").fetchall()
+                                      FROM operation_log""").fetchall()
         print(f"В система {len(data_log)} операций:")
         for i in data_log:
             print(i)
@@ -83,8 +83,13 @@ while True:
         import_file(con, '../data/orders_file.csv')
         print("Успешно!")
 
-
-
+    if a == 8:
+        print("Отчет(KPI)")
+        kpi = get_kpi(con)
+        print(f"Среднее время выдачи: {kpi['avg_issue_time']} дня")
+        print(f"Выдано в день поступления: {kpi['issued_same_day']} заказов")
+        print(f"Просроченных заказов (>7 дней): {kpi['overdue_orders']}")
+        print(f"Всего обработано заказов: {kpi['total_processed']}")
 
     if a == 9:
         print("Хорошего дня")

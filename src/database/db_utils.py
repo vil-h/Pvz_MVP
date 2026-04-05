@@ -32,6 +32,7 @@ def db_init(con):
                 client_id INTEGER,
                 status VARCHAR,
                 arrived_at TEXT,
+                issued_at TEXT,
                 FOREIGN KEY (client_id) REFERENCES client(client_id))""")
     con.execute("""INSERT OR IGNORE INTO orders(
                 order_id,
@@ -41,7 +42,7 @@ def db_init(con):
                 VALUES(
                 1,
                 1,
-                'выдан',
+                'на складе',
                 '2026-03-30')""")
 
     # ТАБЛИЦА ЛОГОВ
