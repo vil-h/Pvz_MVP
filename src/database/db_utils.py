@@ -1,6 +1,8 @@
 import sqlite3
+from pathlib import Path
 def get_connection():
-    con = sqlite3.connect("../data/database.db")
+    db_path = Path(__file__).parent.parent.parent / "data" / "database.db"
+    con = sqlite3.connect(str(db_path))
     db_init(con)
     return con
 
@@ -55,18 +57,7 @@ def db_init(con):
                     FOREIGN KEY (order_id) REFERENCES orders(order_id),
                     FOREIGN KEY (emp_id) REFERENCES employees(emp_id) )""")
 
-    con.execute("""INSERT OR IGNORE INTO operation_log(
-                    log_id,
-                    order_id,
-                    emp_id,
-                    action,
-                    time)
-                    VALUES(
-                    1,
-                    1,
-                    1,
-                    'Выдан',
-                    '2026-03-30')""")
+
 
     con.commit()
 
