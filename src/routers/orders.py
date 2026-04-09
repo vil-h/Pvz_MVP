@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, status
 from src.database.db_utils import get_connection, close_connection
 from src.schemas.schemas import SOrderResponse, SKpiReport
-from src.models.models import Order
+from src.models.models import Order, OrderNotIssuableError
 from src.reports import get_kpi
 from src.importers.import_csv_file import import_file
 router = APIRouter(prefix="/order")
@@ -56,10 +56,13 @@ def issue_order(order_id:int):
     con = get_connection()
     try:
         orders = Order.find_by_id(con, order_id)
-        if orders:
-            orders.issue(emp_id=1)
-            return {"status": orders.status, "message": f"Заказ №{order_id} выдан"}
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Заказ №{order_id} не найден")
+        if not orders:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Заказ №{order_id} не найден")
+        orders.issue(emp_id=1)
+        return {"status": orders.status, "message": f"Заказ №{order_id} выдан"}
+
+    except OrderNotIssuableError:
+            raise HTTPException(status_code=status.HTTP_200_OK, detail=f"Заказ уже выдан!")
     finally:
         close_connection(con)
 
@@ -74,6 +77,9 @@ def cancel_order(orders_id:int):
             orders.cancel(emp_id=1)
             return {"status": orders.status, "message": f"Заказ №{orders_id} отменён"}
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Заказ №{orders_id} не найден")
+
+    except OrderNotIssuableError:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Заказ имеет статус '{orders.status}', отмена невозможна!")
     finally:
         close_connection(con)
 
@@ -88,6 +94,9 @@ def refund_order(or_id:int):
             orders.vosvrat(emp_id=1)
             return {"status": orders.status, "message": f"Заказ №{or_id} возвращен"}
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Заказ №{or_id} не найден")
+
+    except OrderNotIssuableError:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Заказ имеет статус '{orders.status}'")
     finally:
         close_connection(con)
 
